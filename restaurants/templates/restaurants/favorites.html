@@ -18,7 +18,7 @@
             <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0;">
                 <h2>{{ favorite.restaurant.name }}</h2>
                 <p>{{ favorite.restaurant.description }}</p>
-                <a href="{% url 'restaurant_favorite_detail' favorite.restaurant.id %}" style="text-decoration: none; color: #d32f2f; font-weight: bold;">
+                <a href="{% url 'restaurant_detail' favorite.restaurant.place_id %}" style="text-decoration: none; color: #d32f2f; font-weight: bold;">
                     View Details
                 </a>
             </div>

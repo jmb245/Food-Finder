@@ -6,14 +6,21 @@
         </a>
     </div>
 {% else %}
-    <header>
-        <h1>{{ restaurant.name }}</h1>
-        <a href="{% url 'favorites' %}" class="favorites-button" style="position: absolute; top: 10px; right: 10px; text-decoration: none; font-weight: bold; color: #d32f2f;">
-            ♥ Favorites
-        </a>
-        <a href="{% url 'map_view' %}" class="back-button" style="position: absolute; top: 10px; left: 10px; text-decoration: none; font-weight: bold; color: #d32f2f;">
+    <header style="position: relative; padding-top: 20px;">
+        <!-- Back Button above the restaurant name -->
+        <a href="{% url 'map_view' %}" class="back-button"
+           style="position: absolute; top: 10px; left: 20px; text-decoration: none; font-weight: bold; color: #d32f2f;">
             ⬅ Back to Map
         </a>
+
+        <!-- Favorites button in top-right -->
+        <a href="{% url 'favorites' %}" class="favorites-button"
+           style="position: absolute; top: 10px; right: 20px; text-decoration: none; font-weight: bold; color: #d32f2f;">
+            ♥ Favorites
+        </a>
+
+        <!-- Restaurant name after the back button -->
+        <h1 style="margin-top: 50px; text-align: center;">{{ restaurant.name }}</h1>
     </header>
 
     <section class="restaurant-info">
@@ -21,18 +28,23 @@
         <p><strong>Contact Info:</strong> {{ restaurant.contact_info|default:"Not available" }}</p>
         <p><strong>Rating:</strong> {{ restaurant.rating|default:"Not rated" }}</p>
 
-        <!-- Add/Remove from Favorites Button -->
-        {% if restaurant_db in user.favorite_set.all %}
-            <form action="{% url 'toggle_favorite' restaurant_db.id %}" method="POST">
-                {% csrf_token %}
-                <button type="submit">Remove from Favorites</button>
-            </form>
-        {% else %}
-            <form action="{% url 'toggle_favorite' restaurant_db.id %}" method="POST">
-                {% csrf_token %}
-                <button type="submit">Add to Favorites</button>
-            </form>
-        {% endif %}
+        <!-- Add or Remove from Favorites Button -->
+        <form action="{% url 'toggle_favorite' restaurant_db.id %}" method="POST" id="favorite-form">
+            {% csrf_token %}
+            {% if is_favorite %}
+                <!-- Remove from Favorites Button -->
+                <button type="submit" class="favorite-button"
+                    style="background-color: #b71c1c; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px;">
+                    Remove from Favorites
+                </button>
+            {% else %}
+                <!-- Add to Favorites Button -->
+                <button type="submit" class="favorite-button"
+                    style="background-color: #d32f2f; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px;">
+                    Add to Favorites
+                </button>
+            {% endif %}
+        </form>
     </section>
 
     <section class="reviews">
