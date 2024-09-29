@@ -12,4 +12,6 @@ urlpatterns = [
     path('restaurant/<str:place_id>/', views.restaurant_detail_view, name='restaurant_detail'),
     path('restaurant/<int:restaurant_id>/favorite/', views.toggle_favorite, name='toggle_favorite'),
     path('favorites/', views.favorites_view, name='favorites'),
+    path('restaurant/favorite/<int:restaurant_id>/', views.restaurant_favorite_detail_view, name='restaurant_favorite_detail'),
+
 ]

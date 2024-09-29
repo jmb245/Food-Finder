@@ -106,8 +106,7 @@ def logout_view(request):
     return redirect('login')  # Redirect to login page after logout
 
 
-
-
+# Signup View
 
 def password_reset_form_view(request):
     # Handle password reset form logic
@@ -165,8 +164,8 @@ def restaurant_detail_view(request, place_id):
     context = {
         'restaurant': restaurant_data,
         'restaurant_db': restaurant_db,  # This is the restaurant from the database
-        'user_lat': request.GET.get('user_lat', None),  # Assuming user location is passed in the query params
-        'user_lon': request.GET.get('user_lon', None),  # Assuming user location is passed in the query params
+        'user_lat': request.session.get('user_lat', 33.7490),  # Default to Atlanta if not available
+        'user_lon': request.session.get('user_lon', -84.3880),  # Default to Atlanta if not available
         'google_maps_api_key': settings.GOOGLE_API_KEY,
         'latitude': latitude,
         'longitude': longitude,
@@ -183,18 +182,16 @@ def favorites_view(request):
 
 
 @login_required
-@csrf_exempt  # Allow AJAX requests
 def toggle_favorite(request, restaurant_id):
     restaurant = get_object_or_404(Restaurant, id=restaurant_id)
     favorite, created = Favorite.objects.get_or_create(user=request.user, restaurant=restaurant)
 
     if not created:
         favorite.delete()
-        favorited = False
-    else:
-        favorited = True
 
-    return JsonResponse({'favorited': favorited})
+    # After adding/removing, redirect to the favorites page
+    return redirect('favorites')
+
 
 
 
@@ -202,3 +199,27 @@ def restaurant_detail(request, place_id):  # <-- Make sure to accept place_id he
     # Replace this line with how you're getting the restaurant data. For example, using Google Places API or your database.
     restaurant = get_object_or_404(Restaurant, place_id=place_id)  # <-- Change this according to your model or API
     return render(request, 'restaurants/restaurant_details.html', {'restaurant': restaurant})
+
+
+@login_required
+def restaurant_favorite_detail_view(request, restaurant_id):
+    # Fetch the restaurant from your database
+    restaurant = get_object_or_404(Restaurant, id=restaurant_id)
+
+    # If you have reviews from the Google API or another source
+    reviews = []  # Replace this with how you fetch the reviews
+    if restaurant.place_id:  # Assuming the restaurant has a place_id
+        details_url = f'https://maps.googleapis.com/maps/api/place/details/json?place_id={restaurant.place_id}&key={settings.GOOGLE_API_KEY}'
+        response = requests.get(details_url)
+        restaurant_data = response.json().get('result', {})
+        reviews = restaurant_data.get('reviews', [])  # Fetch the reviews from the API
+
+    context = {
+        'restaurant': restaurant,
+        'reviews': reviews,  # Pass the reviews to the template
+        'user_lat': request.session.get('user_lat', 33.7490),  # Default to Atlanta if not available
+        'user_lon': request.session.get('user_lon', -84.3880),
+        'google_maps_api_key': settings.GOOGLE_API_KEY,  # Pass the Google API key for the map
+    }
+
+    return render(request, 'restaurants/restaurant_favorite_detail.html', context)

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ restaurant.name }} - Restaurant Details</title>
+    <title>{{ restaurant.name }} - Favorite Restaurant Details</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap">
@@ -52,12 +52,11 @@
     }
     </script>
 
-
 </head>
 <body onload="initMap()">
     <header>
         <h1>{{ restaurant.name }}</h1>
-        <a href="{% url 'map_view' %}">Back to Map</a>
+        <a href="{% url 'favorites' %}">Back to Favorites</a>
     </header>
 
     <section class="restaurant-info">
@@ -65,23 +64,19 @@
         <p><strong>Contact Info:</strong> {{ restaurant.contact_info|default:"Not available" }}</p>
         <p><strong>Rating:</strong> {{ restaurant.rating|default:"Not rated" }}</p>
 
-        <!-- Add to Favorites Button -->
-        {% if user.is_authenticated %}
-            <form action="{% url 'toggle_favorite' restaurant_db.id %}" method="POST">
-                {% csrf_token %}
-                <button type="submit">Add to Favorites</button>
-            </form>
-        {% else %}
-            <p><a href="{% url 'login' %}">Log in</a> to add to favorites</p>
-        {% endif %}
+        <!-- Remove from Favorites Button -->
+        <form action="{% url 'toggle_favorite' restaurant.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit">Remove from Favorites</button>
+        </form>
     </section>
 
-    <!-- Reviews Section -->
+        <!-- Reviews Section -->
     <section class="reviews">
         <h2>Reviews</h2>
-        {% if restaurant.reviews %}
+        {% if reviews %}
             <ul>
-                {% for review in restaurant.reviews %}
+                {% for review in reviews %}
                     <li>
                         <p><strong>{{ review.author_name }}</strong> rated <strong>{{ review.rating }}</strong></p>
                         <p>{{ review.text }}</p>
