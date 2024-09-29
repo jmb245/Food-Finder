@@ -106,19 +106,8 @@ def logout_view(request):
     return redirect('login')  # Redirect to login page after logout
 
 
-# Signup View
-def signup(request):
-    if request.method == 'POST':
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('home')  # Redirect to home page after signup
-        else:
-            messages.error(request, "Signup failed. Please correct the errors.")
-    else:
-        form = SignUpForm()
-    return render(request, 'signup.html', {'form': form})
+
+
 
 def password_reset_form_view(request):
     # Handle password reset form logic
