@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Restaurants</title>
+</head>
+<body>
+    <h2>Search Restaurants</h2>
+    <form method="get">
+        {{ form.as_p }}
+        <button type="submit">Search</button>
+    </form>
+    <ul>
+        {% for restaurant in results %}
+            <li>{{ restaurant.name }} - {{ restaurant.cuisine_type }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

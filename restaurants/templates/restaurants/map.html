@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATL Food Finder</title>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap"></script>
+    <style>
+        /* General styles */
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #f8f8f8;
+        }
+
+        h1 {
+            margin: 0;
+            color: #d32f2f;
+        }
+
+        .favorites-button {
+            text-decoration: none;
+            color: #000;
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .heart-icon {
+            background-image: url('heart-icon.png'); /* Add your heart icon image here */
+            width: 16px;
+            height: 16px;
+            background-size: cover;
+            margin-right: 5px;
+        }
+
+        .search-bar {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #d32f2f;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #filter-button {
+            display: flex;
+            align-items: center;
+            background-color: #757575;
+        }
+
+        .filter-icon {
+            background-image: url('filter-icon.png'); /* Add your filter icon image here */
+            width: 16px;
+            height: 16px;
+            background-size: cover;
+            margin-right: 5px;
+        }
+
+        #filters-panel {
+            display: none; /* Hidden by default */
+            padding: 20px;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #filters-panel label {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        #distance_range, #rating_range {
+            width: 100%;
+        }
+
+        #distance_value, #rating_value {
+            display: block;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        /* Map styles */
+        #map {
+            height: 500px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        /* Restaurant list */
+        .restaurant-list {
+            margin-top: 20px;
+            padding: 0 20px;
+        }
+
+        .restaurant-list h2 {
+            color: #d32f2f;
+        }
+
+        .no-restaurants {
+            text-align: center;
+            font-size: 18px;
+            color: #757575;
+        }
+
+        .restaurant-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .restaurant-list li {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .restaurant-list li h2 {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Welcome {{ user.username }}!</h1>
+        <a href="{% url 'favorites' %}" class="favorites-button">
+            <i class="heart-icon"></i> Favorites
+        </a>
+    </div>
+
+    <form method="GET" action="{% url 'map_view' %}">
+        <div class="search-bar">
+            <input type="text" name="name" placeholder="Name" value="{{ request.GET.name }}">
+            <input type="text" name="cuisine_type" placeholder="Cuisine Type" value="{{ request.GET.cuisine_type }}">
+            <input type="text" name="location" placeholder="Location" value="{{ request.GET.location }}">
+            <button type="submit" class="search-button">Search</button>
+            <button type="button" id="filter-button">
+                <i class="filter-icon"></i> Filters
+            </button>
+        </div>
+
+        <!-- Filters section (initially hidden, toggled by the Filters button) -->
+        <div id="filters-panel">
+            <label for="distance_range">Max Distance (in km):</label>
+            <input type="range" id="distance_range" name="distance_range" min="1" max="100" value="{{ request.GET.distance_range|default:50 }}">
+            <span id="distance_value">{{ request.GET.distance_range|default:50 }} km</span>
+
+            <label for="rating_range">Min Rating:</label>
+            <input type="range" id="rating_range" name="rating_range" min="0" max="5" step="0.1" value="{{ request.GET.rating_range|default:0 }}">
+            <span id="rating_value">{{ request.GET.rating_range|default:0 }}</span>
+
+            <button type="submit">Search</button>
+            <button type="reset" id="reset-filters">Reset Filters</button>
+        </div>
+    </form>
+
+    <!-- Google Map -->
+    <div id="map"></div>
+
+    <!-- Restaurant List -->
+    <div class="restaurant-list">
+        {% if restaurants %}
+            <ul>
+                {% for restaurant in restaurants %}
+                    <li onclick="window.location.href='{% url 'restaurant_detail' restaurant.place_id %}'">
+                        <h2>{{ restaurant.name }}</h2>
+                        <p>Location: {{ restaurant.vicinity }}</p>
+                        <p>Rating: {{ restaurant.rating }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="no-restaurants">No restaurants found matching your search criteria.</p>
+        {% endif %}
+    </div>
+
+    <script>
+        let map;
+
+        function initMap() {
+            // Attempt to use the browser's geolocation API
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    map = new google.maps.Map(document.getElementById("map"), {
+                        zoom: 12,
+                        center: userLocation
+                    });
+
+                    // Add blue marker for user's location
+                    new google.maps.Marker({
+                        position: userLocation,
+                        map: map,
+                        title: 'Your Location',
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            scale: 10,
+                            fillColor: '#00f',
+                            fillOpacity: 0.8,
+                            strokeColor: '#00f',
+                            strokeOpacity: 1,
+                            strokeWeight: 2
+                        }
+                    });
+
+                    // Add restaurant markers
+                    {% for restaurant in restaurants %}
+                        var marker = new google.maps.Marker({
+                            position: { lat: {{ restaurant.geometry.location.lat }}, lng: {{ restaurant.geometry.location.lng }} },
+                            map: map,
+                            title: '{{ restaurant.name }}'
+                        });
+
+                        // Clicking the marker will navigate to restaurant details
+                        google.maps.event.addListener(marker, 'click', function() {
+                            window.location.href = '{% url "restaurant_detail" restaurant.place_id %}';
+                        });
+                    {% endfor %}
+                }, function() {
+                    // Handle error if geolocation fails
+                    handleLocationError(true, map.getCenter());
+                });
+            } else {
+                // Browser doesn't support Geolocation
+                handleLocationError(false, map.getCenter());
+            }
+        }
+
+        function handleLocationError(browserHasGeolocation, pos) {
+            const infoWindow = new google.maps.InfoWindow({
+                position: pos,
+                content: browserHasGeolocation
+                    ? "Error: The Geolocation service failed."
+                    : "Error: Your browser doesn't support geolocation.",
+            });
+            infoWindow.open(map);
+        }
+
+        // Toggle filters panel
+        document.getElementById('filter-button').addEventListener('click', function() {
+            var panel = document.getElementById('filters-panel');
+            panel.style.display = (panel.style.display === 'none' || panel.style.display === '') ? 'block' : 'none';
+        });
+
+        // Update distance and rating range dynamically
+        var distanceInput = document.getElementById('distance_range');
+        var distanceValue = document.getElementById('distance_value');
+        distanceInput.addEventListener('input', function() {
+            distanceValue.textContent = distanceInput.value + " km";
+        });
+
+        var ratingInput = document.getElementById('rating_range');
+        var ratingValue = document.getElementById('rating_value');
+        ratingInput.addEventListener('input', function() {
+            ratingValue.textContent = ratingInput.value;
+        });
+
+        // Pre-fill distance and rating values on load
+        distanceValue.textContent = distanceInput.value + " km";
+        ratingValue.textContent = ratingInput.value;
+    </script>
+</body>
+</html>

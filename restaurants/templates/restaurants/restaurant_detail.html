@@ -1,0 +1,201 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ restaurant.name }} - Restaurant Details</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap"></script>
+
+    <script>
+        // Initialize the map and add markers for both the restaurant and the user location
+        function initMap() {
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: {lat: {{ restaurant.latitude }}, lng: {{ restaurant.longitude }}},
+                zoom: 14
+            });
+
+            // Marker for the restaurant (red)
+            var restaurantMarker = new google.maps.Marker({
+                position: {lat: {{ restaurant.latitude }}, lng: {{ restaurant.longitude }}},
+                map: map,
+                title: '{{ restaurant.name }}',
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: '#FF0000',
+                    fillOpacity: 1,
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 1,
+                    strokeWeight: 2
+                }
+            });
+
+            // Marker for the user (blue)
+            var userMarker = new google.maps.Marker({
+                position: {lat: {{ user_lat }}, lng: {{ user_lon }}},
+                map: map,
+                title: 'Your Location',
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: '#0000FF',
+                    fillOpacity: 0.8,
+                    strokeColor: '#0000FF',
+                    strokeOpacity: 1,
+                    strokeWeight: 2
+                }
+            });
+        }
+
+        // Handle favorite button click using AJAX
+        function toggleFavorite(restaurantId) {
+            const button = document.getElementById('favorite-button');
+
+            fetch(`/restaurants/restaurant/${restaurantId}/favorite/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.favorited) {
+                    // Add class for "Remove from Favorites"
+                    button.textContent = 'Remove from Favorites';
+                    button.classList.add('favorited');
+                } else {
+                    // Remove class for "Add to Favorites"
+                    button.textContent = 'Add to Favorites';
+                    button.classList.remove('favorited');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background-color: #d32f2f;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        section {
+            padding: 20px;
+        }
+
+        .restaurant-info p {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .reviews ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .reviews li {
+            background-color: #f9f9f9;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #b71c1c;
+        }
+
+        button.favorited {
+            background-color: #4CAF50; /* Green when favorited */
+        }
+
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+        }
+
+        footer a {
+            color: #d32f2f;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body onload="initMap()">
+    <header>
+        <h1>{{ restaurant.name }}</h1>
+        <a href="{% url 'map_view' %}" class="back-to-map">Back to Map</a>
+    </header>
+
+    <section class="restaurant-info">
+        <p><strong>Location:</strong> {{ restaurant.location }}</p>
+        <p><strong>Contact Info:</strong> {{ restaurant.contact_info|default:"Not available" }}</p>
+        <p><strong>Rating:</strong> {{ restaurant.rating|default:"Not rated" }}</p>
+
+        <!-- Add to Favorites Button -->
+        {% if user.is_authenticated %}
+            <button id="favorite-button" class="{% if restaurant_db and restaurant_db in user.favorite_set.all %}favorited{% endif %}" onclick="toggleFavorite({{ restaurant_db.id }})">
+                {% if restaurant_db and restaurant_db in user.favorite_set.all %}
+                    Remove from Favorites
+                {% else %}
+                    Add to Favorites
+                {% endif %}
+            </button>
+        {% else %}
+            <p><a href="{% url 'login' %}">Log in</a> to add to favorites</p>
+        {% endif %}
+    </section>
+
+    <!-- Reviews Section -->
+    <section class="reviews">
+        <h2>Reviews</h2>
+        {% if restaurant.reviews %}
+            <ul>
+                {% for review in restaurant.reviews %}
+                    <li>
+                        <p><strong>{{ review.author_name }}</strong> rated <strong>{{ review.rating }}</strong></p>
+                        <p>{{ review.text }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No reviews available for this restaurant.</p>
+        {% endif %}
+    </section>
+
+    <!-- Map Section -->
+    <section class="restaurant-map">
+        <h2>Location on Map</h2>
+        <div id="map"></div>
+    </section>
+
+    <footer>
+        <a href="{% url 'map_view' %}">Back to Map</a>
+    </footer>
+</body>
+</html>

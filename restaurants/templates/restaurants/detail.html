@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ restaurant.name }} Details</title>
+</head>
+<body>
+    <h1>{{ restaurant.name }}</h1>
+    <p>{{ restaurant.cuisine_type }}</p>
+    <p>{{ restaurant.address }}</p>
+    <p>{{ restaurant.contact_info }}</p>
+    <p>{{ restaurant.rating }}</p>
+    <a href="https://maps.google.com/?q={{ restaurant.latitude }},{{ restaurant.longitude }}" target="_blank">Get Directions</a>
+</body>
+</html>
