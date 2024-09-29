@@ -1,63 +1,19 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ restaurant.name }} - Restaurant Details</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap">
-    </script>
-
-    <script>
-    function initMap() {
-        var restaurantLocation = { lat: {{ restaurant.latitude }}, lng: {{ restaurant.longitude }} };
-        var userLocation = { lat: {{ user_lat }}, lng: {{ user_lon }} };
-
-        var map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 14,
-            center: restaurantLocation,
-        });
-
-        // Marker for the restaurant (red)
-        new google.maps.Marker({
-            position: restaurantLocation,
-            map: map,
-            title: '{{ restaurant.name }}',
-            icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: 10,
-                fillColor: '#FF0000',
-                fillOpacity: 1,
-                strokeColor: '#FF0000',
-                strokeWeight: 2
-            }
-        });
-
-        // Marker for the user (blue)
-        new google.maps.Marker({
-            position: userLocation,
-            map: map,
-            title: 'Your Location',
-            icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: 10,
-                fillColor: '#0000FF',
-                fillOpacity: 1,
-                strokeColor: '#0000FF',
-                strokeWeight: 2
-            }
-        });
-    }
-    </script>
-
-
-</head>
-<body onload="initMap()">
+{% if login_required %}
+    <div style="text-align: center; padding: 50px;">
+        <h1 style="color: #d32f2f;">Log in to view restaurant details</h1>
+        <a href="{% url 'login' %}" style="text-decoration: none; color: #d32f2f; font-size: 20px;">
+            Click here to log in
+        </a>
+    </div>
+{% else %}
     <header>
         <h1>{{ restaurant.name }}</h1>
-        <a href="{% url 'map_view' %}">Back to Map</a>
+        <a href="{% url 'favorites' %}" class="favorites-button" style="position: absolute; top: 10px; right: 10px; text-decoration: none; font-weight: bold; color: #d32f2f;">
+            ♥ Favorites
+        </a>
+        <a href="{% url 'map_view' %}" class="back-button" style="position: absolute; top: 10px; left: 10px; text-decoration: none; font-weight: bold; color: #d32f2f;">
+            ⬅ Back to Map
+        </a>
     </header>
 
     <section class="restaurant-info">
@@ -65,18 +21,20 @@
         <p><strong>Contact Info:</strong> {{ restaurant.contact_info|default:"Not available" }}</p>
         <p><strong>Rating:</strong> {{ restaurant.rating|default:"Not rated" }}</p>
 
-        <!-- Add to Favorites Button -->
-        {% if user.is_authenticated %}
+        <!-- Add/Remove from Favorites Button -->
+        {% if restaurant_db in user.favorite_set.all %}
+            <form action="{% url 'toggle_favorite' restaurant_db.id %}" method="POST">
+                {% csrf_token %}
+                <button type="submit">Remove from Favorites</button>
+            </form>
+        {% else %}
             <form action="{% url 'toggle_favorite' restaurant_db.id %}" method="POST">
                 {% csrf_token %}
                 <button type="submit">Add to Favorites</button>
             </form>
-        {% else %}
-            <p><a href="{% url 'login' %}">Log in</a> to add to favorites</p>
         {% endif %}
     </section>
 
-    <!-- Reviews Section -->
     <section class="reviews">
         <h2>Reviews</h2>
         {% if restaurant.reviews %}
@@ -93,11 +51,54 @@
         {% endif %}
     </section>
 
-    <!-- Map Section -->
     <section class="restaurant-map">
         <h2>Location on Map</h2>
-        <div id="map"></div>
+        <div id="map" style="height: 400px; width: 100%;"></div>
     </section>
 
-</body>
-</html>
+    <footer>
+        <a href="{% url 'map_view' %}">Back to Map</a>
+    </footer>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap"></script>
+    <script>
+        function initMap() {
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: {lat: {{ latitude }}, lng: {{ longitude }}},
+                zoom: 14
+            });
+
+            // Marker for the restaurant (red)
+            var restaurantMarker = new google.maps.Marker({
+                position: {lat: {{ latitude }}, lng: {{ longitude }}},
+                map: map,
+                title: '{{ restaurant.name }}',
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: '#FF0000',
+                    fillOpacity: 1,
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 1,
+                    strokeWeight: 2
+                }
+            });
+
+            // Marker for the user (blue)
+            var userMarker = new google.maps.Marker({
+                position: {lat: {{ user_lat }}, lng: {{ user_lon }}},
+                map: map,
+                title: 'Your Location',
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: '#0000FF',
+                    fillOpacity: 0.8,
+                    strokeColor: '#0000FF',
+                    strokeOpacity: 1,
+                    strokeWeight: 2
+                }
+            });
+        }
+    </script>
+{% endif %}

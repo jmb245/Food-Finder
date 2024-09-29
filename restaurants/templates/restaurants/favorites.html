@@ -1,20 +1,29 @@
-<div style="position: relative; padding: 20px;">
-    <a href="{% url 'map_view' %}" class="back-button" style="position: absolute; top: 0; left: 0; text-decoration: none; font-weight: bold; color: #d32f2f;">
-        ⬅ Back to Map
-    </a>
-    <h1 style="text-align: center; margin: 0;">Your Favorites</h1>
-</div>
+{% if login_required %}
+    <div style="text-align: center; padding: 50px;">
+        <h1 style="color: #d32f2f;">Log in to add favorites</h1>
+        <a href="{% url 'login' %}" style="text-decoration: none; color: #d32f2f; font-size: 20px;">
+            Click here to log in
+        </a>
+    </div>
+{% else %}
+    <div style="position: relative; padding: 20px;">
+        <a href="{% url 'map_view' %}" class="back-button" style="position: absolute; top: 0; left: 0; text-decoration: none; font-weight: bold; color: #d32f2f;">
+            ⬅ Back to Map
+        </a>
+        <h1 style="text-align: center; margin: 0;">Your Favorites</h1>
+    </div>
 
-<ul style="list-style: none; padding: 0;">
-    {% for favorite in favorites %}
-        <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0;">
-            <h2>{{ favorite.restaurant.name }}</h2>
-            <p>{{ favorite.restaurant.description }}</p>
-            <a href="{% url 'restaurant_favorite_detail' favorite.restaurant.id %}" style="text-decoration: none; color: #d32f2f; font-weight: bold;">
-                View Details
-            </a>
-        </div>
-    {% empty %}
-        <p>You have no favorite restaurants.</p>
-    {% endfor %}
-</ul>
+    <ul style="list-style: none; padding: 0;">
+        {% for favorite in favorites %}
+            <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0;">
+                <h2>{{ favorite.restaurant.name }}</h2>
+                <p>{{ favorite.restaurant.description }}</p>
+                <a href="{% url 'restaurant_favorite_detail' favorite.restaurant.id %}" style="text-decoration: none; color: #d32f2f; font-weight: bold;">
+                    View Details
+                </a>
+            </div>
+        {% empty %}
+            <p>You have no favorite restaurants.</p>
+        {% endfor %}
+    </ul>
+{% endif %}

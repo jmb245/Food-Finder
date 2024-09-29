@@ -132,53 +132,64 @@ def signup(request):
 
 def restaurant_detail_view(request, place_id):
     """Fetch restaurant details from Google Places API."""
-    # Google Places Details API URL
-    details_url = f'https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&key={settings.GOOGLE_API_KEY}'
-    response = requests.get(details_url)
-    restaurant_data = response.json().get('result', {})
 
-    # Handle missing 'geometry' data gracefully
-    geometry = restaurant_data.get('geometry')
-    if geometry:
-        latitude = geometry['location']['lat']
-        longitude = geometry['location']['lng']
-    else:
-        latitude = 33.7490  # Fallback (Atlanta's coordinates)
-        longitude = -84.3880
+    # Check if user is not logged in, and pass a flag to the template
+    login_required = not request.user.is_authenticated
 
-    # Check if the restaurant exists in the local database by place_id
-    restaurant_db, created = Restaurant.objects.get_or_create(
-        place_id=place_id,  # Assuming you've added a place_id field to your Restaurant model
-        defaults={
-            'name': restaurant_data.get('name', 'No Name'),
-            'location': restaurant_data.get('formatted_address', 'No Address'),
-            'cuisine_type': 'Unknown',
+    if not login_required:
+        # Fetch restaurant details from Google Places API
+        details_url = f'https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&key={settings.GOOGLE_API_KEY}'
+        response = requests.get(details_url)
+        restaurant_data = response.json().get('result', {})
+
+        # Handle missing 'geometry' data gracefully
+        geometry = restaurant_data.get('geometry')
+        if geometry:
+            latitude = geometry['location']['lat']
+            longitude = geometry['location']['lng']
+        else:
+            latitude = 33.7490  # Fallback (Atlanta's coordinates)
+            longitude = -84.3880
+
+        # Check if the restaurant exists in the local database by place_id
+        restaurant_db, created = Restaurant.objects.get_or_create(
+            place_id=place_id,
+            defaults={
+                'name': restaurant_data.get('name', 'No Name'),
+                'location': restaurant_data.get('formatted_address', 'No Address'),
+                'cuisine_type': 'Unknown',
+                'latitude': latitude,
+                'longitude': longitude,
+                'rating': restaurant_data.get('rating', 0),
+                'description': restaurant_data.get('description', 'No description available')
+            }
+        )
+
+        context = {
+            'restaurant': restaurant_data,
+            'restaurant_db': restaurant_db,
+            'user_lat': request.GET.get('user_lat', None),
+            'user_lon': request.GET.get('user_lon', None),
+            'google_maps_api_key': settings.GOOGLE_API_KEY,
             'latitude': latitude,
             'longitude': longitude,
-            'rating': restaurant_data.get('rating', 0),
-            'description': restaurant_data.get('description', 'No description available')
+            'login_required': login_required,  # Add flag for login status
         }
-    )
-
-    # Prepare context data
-    context = {
-        'restaurant': restaurant_data,
-        'restaurant_db': restaurant_db,  # This is the restaurant from the database
-        'user_lat': request.session.get('user_lat', 33.7490),  # Default to Atlanta if not available
-        'user_lon': request.session.get('user_lon', -84.3880),  # Default to Atlanta if not available
-        'google_maps_api_key': settings.GOOGLE_API_KEY,
-        'latitude': latitude,
-        'longitude': longitude,
-    }
+    else:
+        # User is not logged in, just show the login prompt
+        context = {
+            'login_required': login_required,  # Add flag for login status
+        }
 
     return render(request, 'restaurants/restaurant_detail.html', context)
 
 
-@login_required
 def favorites_view(request):
-    favorites = Favorite.objects.filter(user=request.user).select_related('restaurant')
-    return render(request, 'restaurants/favorites.html', {'favorites': favorites})
+    if not request.user.is_authenticated:
+        return render(request, 'restaurants/favorites.html', {'login_required': True})
 
+    favorites = Favorite.objects.filter(user=request.user).select_related('restaurant')
+    return render(request, 'restaurants/favorites.html', {'favorites': favorites, 'login_required': False})
 
 
 @login_required
@@ -187,10 +198,12 @@ def toggle_favorite(request, restaurant_id):
     favorite, created = Favorite.objects.get_or_create(user=request.user, restaurant=restaurant)
 
     if not created:
+        # If the favorite already exists, remove it
         favorite.delete()
 
-    # After adding/removing, redirect to the favorites page
-    return redirect('favorites')
+    # Redirect back to the restaurant detail page
+    return redirect('restaurant_detail', place_id=restaurant.place_id)
+
 
 
 
@@ -223,3 +236,4 @@ def restaurant_favorite_detail_view(request, restaurant_id):
     }
 
     return render(request, 'restaurants/restaurant_favorite_detail.html', context)
+
