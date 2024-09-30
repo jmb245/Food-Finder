@@ -24,7 +24,8 @@
     </header>
 
     <section class="restaurant-info">
-        <p><strong>Contact Info:</strong> {{ restaurant.contact_info|default:"Not available" }}</p>
+        <p><strong>Address:</strong> {{ restaurant.formatted_address|default:"Not available" }}</p>
+        <p><strong>Contact Info:</strong> {{ restaurant.international_phone_number|default:"Not available" }}</p>
         <p><strong>Rating:</strong> {{ restaurant.rating|default:"Not rated" }}</p>
 
         <!-- Add or Remove from Favorites Button -->

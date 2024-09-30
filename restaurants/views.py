@@ -132,10 +132,6 @@ def signup(request):
 
 def restaurant_detail_view(request, place_id):
     """Fetch restaurant details from Google Places API."""
-    if not request.user.is_authenticated:
-        return render(request, 'restaurants/restaurant_detail.html', {'login_required': True})
-
-    # Google Places Details API URL
     details_url = f'https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&key={settings.GOOGLE_API_KEY}'
     response = requests.get(details_url)
     restaurant_data = response.json().get('result', {})
@@ -146,16 +142,15 @@ def restaurant_detail_view(request, place_id):
         latitude = geometry['location']['lat']
         longitude = geometry['location']['lng']
     else:
-        latitude = 33.7490  # Fallback (Atlanta's coordinates)
+        latitude = 33.7490  # Fallback to Atlanta's coordinates
         longitude = -84.3880
 
-    # Check if the restaurant exists in the local database by place_id
+    # Check if the restaurant exists in the local database
     restaurant_db, created = Restaurant.objects.get_or_create(
-        place_id=place_id,  # Assuming you've added a place_id field to your Restaurant model
+        place_id=place_id,
         defaults={
             'name': restaurant_data.get('name', 'No Name'),
             'location': restaurant_data.get('formatted_address', 'No Address'),
-            'cuisine_type': 'Unknown',
             'latitude': latitude,
             'longitude': longitude,
             'rating': restaurant_data.get('rating', 0),
@@ -163,14 +158,11 @@ def restaurant_detail_view(request, place_id):
         }
     )
 
-    # Check if the restaurant is already in the user's favorites
-    is_favorite = Favorite.objects.filter(user=request.user, restaurant=restaurant_db).exists()
-
     # Prepare context data
     context = {
         'restaurant': restaurant_data,
         'restaurant_db': restaurant_db,
-        'is_favorite': is_favorite,
+        'is_favorite': Favorite.objects.filter(user=request.user, restaurant=restaurant_db).exists(),
         'user_lat': request.GET.get('user_lat', None),
         'user_lon': request.GET.get('user_lon', None),
         'google_maps_api_key': settings.GOOGLE_API_KEY,
@@ -179,7 +171,6 @@ def restaurant_detail_view(request, place_id):
     }
 
     return render(request, 'restaurants/restaurant_detail.html', context)
-
 
 def favorites_view(request):
     if not request.user.is_authenticated:
