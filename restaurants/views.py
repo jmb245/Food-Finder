@@ -132,6 +132,15 @@ def signup(request):
 
 def restaurant_detail_view(request, place_id):
     """Fetch restaurant details from Google Places API."""
+
+    # If user is not authenticated, show the login message
+    if not request.user.is_authenticated:
+        context = {
+            'login_required': True  # This will trigger the login message in the template
+        }
+        return render(request, 'restaurants/restaurant_detail.html', context)
+
+    # Fetch restaurant details from Google Places API
     details_url = f'https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&key={settings.GOOGLE_API_KEY}'
     response = requests.get(details_url)
     restaurant_data = response.json().get('result', {})
@@ -168,6 +177,7 @@ def restaurant_detail_view(request, place_id):
         'google_maps_api_key': settings.GOOGLE_API_KEY,
         'latitude': latitude,
         'longitude': longitude,
+        'login_required': False,  # User is logged in, so no need for login message
     }
 
     return render(request, 'restaurants/restaurant_detail.html', context)
