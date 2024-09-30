@@ -8,11 +8,36 @@ class RestaurantSearchForm(forms.Form):
     location = forms.CharField(label='Location', max_length=100, required=False)
 
 class SignUpForm(UserCreationForm):
-    email = forms.EmailField(required=True)  # Include email if needed
+    username = forms.CharField(
+        max_length=150,
+        required=True,
+        label="Username",  # Visible label for the form
+        widget=forms.TextInput(attrs={'placeholder': 'Create a username'})
+    )
+    password1 = forms.CharField(
+        label="Password",
+        required=True,
+        widget=forms.PasswordInput(attrs={'placeholder': 'Create a password'})
+    )
+    password2 = forms.CharField(
+        label="Confirm Password",
+        required=True,
+        widget=forms.PasswordInput(attrs={'placeholder': 'Confirm password'})
+    )
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2')
+        fields = ('username', 'password1', 'password2')
+
+
+class CustomLoginForm(AuthenticationForm):
+    username = forms.CharField(
+        max_length=254,
+        widget=forms.TextInput(attrs={'placeholder': 'Username'})
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'placeholder': 'Password'})
+    )
 
 class LoginForm(AuthenticationForm):
     pass

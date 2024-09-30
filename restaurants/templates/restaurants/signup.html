@@ -1,17 +1,98 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signup</title>
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('{% static 'images/background.jpg' %}');
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .signup-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 15px;
+            width: 400px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 36px;
+            color: #d32f2f;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: stretch; /* Ensures form fields are aligned */
+        }
+        label {
+            font-weight: bold;
+            color: #333;
+            text-align: left;
+        }
+        input[type="text"], input[type="password"] {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 100%;  /* Ensure inputs take full width */
+            box-sizing: border-box;  /* Avoid padding from changing input size */
+        }
+        button {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #b71c1c;
+        }
+        .login-link {
+            display: block;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        .login-link a {
+            text-decoration: none;
+            color: #d32f2f;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <h2>Signup</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}  <!-- Display the form fields -->
-        <button type="submit">Signup</button>
-    </form>
-    <p>Already have an account? <a href="{% url 'login' %}">Login here</a>.</p>
+    <div class="signup-container">
+        <h1>Sign Up</h1>
+        <form method="POST">
+            {% csrf_token %}
+            <div>
+                <label for="id_username">Username</label>
+                {{ form.username }}
+            </div>
+            <div>
+                <label for="id_password1">Password</label>
+                {{ form.password1 }}
+            </div>
+            <div>
+                <label for="id_password2">Confirm Password</label>
+                {{ form.password2 }}
+            </div>
+            <button type="submit">Sign Up!</button>
+        </form>
+        <div class="login-link">
+            Already have an account? <a href="{% url 'login' %}">Log in here</a>
+        </div>
+    </div>
 </body>
 </html>
