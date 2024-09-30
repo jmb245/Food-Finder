@@ -18,6 +18,14 @@
             margin: 0;
         }
 
+        /* Position the logo in the top left */
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 150px;
+        }
+
         .signup-container {
             background-color: rgba(255, 255, 255, 0.9);
             padding: 40px;
@@ -103,6 +111,9 @@
     </style>
 </head>
 <body>
+    <!-- Logo positioned at the top left -->
+    <img src="{% static 'images/logo.jpg' %}" alt="Logo" class="logo">
+
     <div class="signup-container">
         <h1>Sign Up</h1>
         <form method="POST">
@@ -117,7 +128,7 @@
                 <!-- Add password criteria here -->
                 <div class="password-criteria">
                     Your password must be at least 8 characters long, include both uppercase and lowercase letters,
-                    contain numbers.
+                    and contain numbers.
                 </div>
             </div>
             <div>
