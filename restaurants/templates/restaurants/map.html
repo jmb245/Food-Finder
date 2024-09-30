@@ -1,6 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Add this to the header section of your page -->
+    <header style="position: relative; padding: 20px;">
+        <!-- Add or Remove Login/Logout Button -->
+        {% if user.is_authenticated %}
+            <!-- If the user is logged in, show a logout button -->
+            <a href="{% url 'logout' %}" class="auth-button"
+               style="position: absolute; top: 10px; right: 20px; text-decoration: none; font-weight: bold; color: #d32f2f;">
+               Log Out
+            </a>
+        {% else %}
+            <!-- If the user is not logged in, show a login button -->
+            <a href="{% url 'login' %}" class="auth-button"
+               style="position: absolute; top: 10px; right: 20px; text-decoration: none; font-weight: bold; color: #d32f2f;">
+               Log In
+            </a>
+        {% endif %}
+    </header>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATL Food Finder</title>

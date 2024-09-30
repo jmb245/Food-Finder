@@ -1,29 +1,119 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Favorites</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('{% static 'images/background.jpg' %}');
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+        }
+        h1 {
+            font-size: 36px;
+            text-align: center;
+            color: #d32f2f;
+        }
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            color: #d32f2f;
+            font-size: 18px;
+        }
+        .favorites-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .favorite-item {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            width: 30%;
+            margin: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .favorite-item h2 {
+            font-size: 24px;
+            color: #333;
+            margin: 0 0 10px 0;
+        }
+        .favorite-item a {
+            text-decoration: none;
+            color: #d32f2f;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .no-favorites {
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+            margin: 50px 0;
+        }
+        .login-message {
+            text-align: center;
+            padding: 50px;
+        }
+        .login-message h1 {
+            color: #d32f2f;
+            font-size: 36px;
+        }
+        .login-message a {
+            text-decoration: none;
+            color: #d32f2f;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+
 {% if login_required %}
-    <div style="text-align: center; padding: 50px;">
-        <h1 style="color: #d32f2f;">Log in to add favorites</h1>
-        <a href="{% url 'login' %}" style="text-decoration: none; color: #d32f2f; font-size: 20px;">
-            Click here to log in
-        </a>
+    <!-- Not logged in, prompt user to log in -->
+    <div class="login-message">
+        <h1>Log in to view your favorites</h1>
+        <a href="{% url 'login' %}">Click here to log in</a>
     </div>
 {% else %}
-    <div style="position: relative; padding: 20px;">
-        <a href="{% url 'map_view' %}" class="back-button" style="position: absolute; top: 0; left: 0; text-decoration: none; font-weight: bold; color: #d32f2f;">
-            ⬅ Back to Map
-        </a>
-        <h1 style="text-align: center; margin: 0;">Your Favorites</h1>
-    </div>
+    <!-- Logged in: Show user's favorites -->
+    <div class="container">
+        <!-- Back button to return to the map -->
+        <a href="{% url 'map_view' %}" class="back-button">⬅ Back to Map</a>
 
-    <ul style="list-style: none; padding: 0;">
-        {% for favorite in favorites %}
-            <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0;">
-                <h2>{{ favorite.restaurant.name }}</h2>
-                <p>{{ favorite.restaurant.description }}</p>
-                <a href="{% url 'restaurant_detail' favorite.restaurant.place_id %}" style="text-decoration: none; color: #d32f2f; font-weight: bold;">
-                    View Details
-                </a>
-            </div>
-        {% empty %}
-            <p>You have no favorite restaurants.</p>
-        {% endfor %}
-    </ul>
+        <h1>Your Favorites</h1>
+
+        <div class="favorites-list">
+            {% for favorite in favorites %}
+                <div class="favorite-item">
+                    <h2>{{ favorite.restaurant.name }}</h2>
+                    <a href="{% url 'restaurant_detail' favorite.restaurant.place_id %}">View Details</a>
+                </div>
+            {% empty %}
+                <p class="no-favorites">You have no favorite restaurants.</p>
+            {% endfor %}
+        </div>
+    </div>
 {% endif %}
+
+</body>
+</html>

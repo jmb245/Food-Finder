@@ -180,12 +180,15 @@ def restaurant_detail_view(request, place_id):
 
     return render(request, 'restaurants/restaurant_detail.html', context)
 
+
 def favorites_view(request):
     if not request.user.is_authenticated:
+        # Show message if not logged in
         return render(request, 'restaurants/favorites.html', {'login_required': True})
-
-    favorites = Favorite.objects.filter(user=request.user).select_related('restaurant')
-    return render(request, 'restaurants/favorites.html', {'favorites': favorites, 'login_required': False})
+    else:
+        # Fetch the user's favorites
+        favorites = Favorite.objects.filter(user=request.user).select_related('restaurant')
+        return render(request, 'restaurants/favorites.html', {'favorites': favorites, 'login_required': False})
 
 
 @login_required

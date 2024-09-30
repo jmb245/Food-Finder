@@ -17,6 +17,7 @@
             height: 100vh;
             margin: 0;
         }
+
         .signup-container {
             background-color: rgba(255, 255, 255, 0.9);
             padding: 40px;
@@ -24,21 +25,25 @@
             width: 400px;
             text-align: center;
         }
+
         h1 {
             font-size: 36px;
             color: #d32f2f;
         }
+
         form {
             display: flex;
             flex-direction: column;
             gap: 20px;
             align-items: stretch; /* Ensures form fields are aligned */
         }
+
         label {
             font-weight: bold;
             color: #333;
             text-align: left;
         }
+
         input[type="text"], input[type="password"] {
             padding: 15px;
             border: 1px solid #ddd;
@@ -47,6 +52,14 @@
             width: 100%;  /* Ensure inputs take full width */
             box-sizing: border-box;  /* Avoid padding from changing input size */
         }
+
+        .password-criteria {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+            text-align: left;  /* Align criteria text to the left */
+        }
+
         button {
             background-color: #d32f2f;
             color: white;
@@ -56,18 +69,36 @@
             cursor: pointer;
             border-radius: 5px;
         }
+
         button:hover {
             background-color: #b71c1c;
         }
+
         .login-link {
             display: block;
             margin-top: 20px;
             font-size: 16px;
         }
+
         .login-link a {
             text-decoration: none;
             color: #d32f2f;
             font-weight: bold;
+        }
+
+        /* Ensure error messages don't touch the input boxes */
+        .errorlist {
+            margin-bottom: 10px;
+            text-align: left;
+            color: red;
+            font-size: 14px;
+        }
+
+        .password-hint {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #555;
+            text-align: left;
         }
     </style>
 </head>
@@ -83,6 +114,11 @@
             <div>
                 <label for="id_password1">Password</label>
                 {{ form.password1 }}
+                <!-- Add password criteria here -->
+                <div class="password-criteria">
+                    Your password must be at least 8 characters long, include both uppercase and lowercase letters,
+                    contain numbers, and have at least one special character.
+                </div>
             </div>
             <div>
                 <label for="id_password2">Confirm Password</label>
