@@ -56,11 +56,11 @@
     <section class="reviews" style="margin-top: 50px; padding: 0 20px;">
         <h2 style="text-align: center; font-family: 'Poppins', sans-serif; font-size: 2rem; color: #333;">Reviews</h2>
         {% if restaurant.reviews %}
-            <ul style="list-style-type: none; padding: 0;">
+            <ul style="list-style-type: none; padding: 0; max-width: 600px; margin: 0 auto">
                 {% for review in restaurant.reviews %}
-                    <li style="background-color: #f9f9f9; padding: 20px; margin: 10px 0; border-radius: 5px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-                        <p style="font-weight: 600; margin: 0;"><strong>{{ review.author_name }}</strong> rated <strong>{{ review.rating }}</strong> stars</p>
-                        <p style="margin: 10px 0;">{{ review.text }}</p>
+                    <li style="background-color: #f9f9f9; padding: 20px; margin: 10px 0; border-radius: 5px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);">
+                        <p style="font-family: 'Merriweather Sans', sans-serif;font-weight: 600; margin: 0;"><strong>{{ review.author_name }}</strong> rated <strong>{{ review.rating }}</strong> stars</p>
+                        <p style="margin: 10px 0; font-family: 'Merriweather Sans', sans-serif;">{{ review.text }}</p>
                     </li>
                 {% endfor %}
             </ul>
