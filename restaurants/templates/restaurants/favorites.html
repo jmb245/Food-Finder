@@ -5,84 +5,153 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Favorites</title>
+    
+    <!-- Google Fonts: Poppins for clean typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- External Stylesheet -->
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+    <!-- Internal CSS for improved design -->
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             background-image: url('{% static 'images/background.jpg' %}');
             background-size: cover;
+            background-position: center;
+            margin: 0;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
         }
+
         .container {
             width: 100%;
             max-width: 1200px;
-            padding: 20px;
+            padding: 30px;
             background-color: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-        }
-        h1 {
-            font-size: 36px;
+            border-radius: 20px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
             text-align: center;
-            color: #d32f2f;
         }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #d32f2f;
+            margin-bottom: 20px;
+        }
+
         .back-button {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 20px;
+            left: 20px;
+            background-color: #d32f2f;
+            color: #fff;
             text-decoration: none;
-            font-weight: bold;
-            color: #d32f2f;
-            font-size: 18px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
         }
+
+        .back-button:hover {
+            background-color: #c62828;
+        }
+
         .favorites-list {
             display: flex;
             flex-wrap: wrap;
-            justify-content: space-between;
+            gap: 20px;
+            justify-content: center;
         }
+
         .favorite-item {
-            background-color: #f9f9f9;
+            background-color: #fff;
             border: 1px solid #ddd;
             border-radius: 10px;
-            width: 30%;
-            margin: 15px;
             padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            width: calc(33.333% - 40px); /* Ensures 3 items per row with spacing */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+
+        .favorite-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
         .favorite-item h2 {
-            font-size: 24px;
+            font-size: 1.5rem;
             color: #333;
-            margin: 0 0 10px 0;
+            margin-bottom: 15px;
         }
+
         .favorite-item a {
+            display: inline-block;
+            background-color: #d32f2f;
+            color: #fff;
             text-decoration: none;
-            color: #d32f2f;
-            font-weight: bold;
-            font-size: 18px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
         }
+
+        .favorite-item a:hover {
+            background-color: #c62828;
+        }
+
         .no-favorites {
-            font-size: 24px;
-            color: #333;
+            font-size: 1.5rem;
+            color: #666;
             text-align: center;
             margin: 50px 0;
         }
+
         .login-message {
             text-align: center;
             padding: 50px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
         }
+
         .login-message h1 {
             color: #d32f2f;
-            font-size: 36px;
+            font-size: 2.5rem;
         }
+
         .login-message a {
             text-decoration: none;
             color: #d32f2f;
-            font-size: 20px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: inline-block;
+            margin-top: 20px;
+            border: 2px solid #d32f2f;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .login-message a:hover {
+            background-color: #d32f2f;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .favorite-item {
+                width: calc(50% - 40px); /* Two items per row on smaller screens */
+            }
+        }
+
+        @media (max-width: 576px) {
+            .favorite-item {
+                width: calc(100% - 40px); /* One item per row on mobile */
+            }
         }
     </style>
 </head>

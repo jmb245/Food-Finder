@@ -2,14 +2,83 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ restaurant.name }} Details</title>
+    
+    <!-- Preconnect for Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Google Font: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Internal CSS for Styling -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1rem;
+            color: #666;
+            margin: 8px 0;
+        }
+
+        a {
+            display: inline-block;
+            background-color: #ff5722;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        a:hover {
+            background-color: #e64a19;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>{{ restaurant.name }}</h1>
-    <p>{{ restaurant.cuisine_type }}</p>
-    <p>{{ restaurant.address }}</p>
-    <p>{{ restaurant.contact_info }}</p>
-    <p>{{ restaurant.rating }}</p>
-    <a href="https://maps.google.com/?q={{ restaurant.latitude }},{{ restaurant.longitude }}" target="_blank">Get Directions</a>
+    <div class="container">
+        <h1>{{ restaurant.name }}</h1>
+        <p><strong>Cuisine:</strong> {{ restaurant.cuisine_type }}</p>
+        <p><strong>Address:</strong> {{ restaurant.address }}</p>
+        <p><strong>Contact:</strong> {{ restaurant.contact_info }}</p>
+        <p><strong>Rating:</strong> ⭐ {{ restaurant.rating }}</p>
+        <a href="https://maps.google.com/?q={{ restaurant.latitude }},{{ restaurant.longitude }}" target="_blank">Get Directions</a>
+    </div>
 </body>
 </html>
+

@@ -4,28 +4,95 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Your App{% endblock %}</title>
+    
+    <!-- Preconnect for Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- External CSS -->
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+    <!-- Internal CSS for Enhancements -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        header {
+            background-color: #ffffff;
+            border-bottom: 2px solid #e0e0e0;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .auth-button {
+            text-decoration: none;
+            font-weight: bold;
+            color: #fff;
+            background-color: #d32f2f;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .auth-button:hover {
+            background-color: #c62828;
+        }
+
+        .content {
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .auth-button {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <header style="position: relative; padding: 20px;">
+
+    <header>
         <!-- Logo or site title -->
         <h1>Your App</h1>
 
         <!-- Add or Remove Login/Logout Button -->
         {% if user.is_authenticated %}
-            <a href="{% url 'logout' %}" class="auth-button"
-               style="position: absolute; top: 10px; right: 20px; text-decoration: none; font-weight: bold; color: #d32f2f;">
-               Log Out
-            </a>
+            <a href="{% url 'logout' %}" class="auth-button">Log Out</a>
         {% else %}
-            <a href="{% url 'login' %}" class="auth-button"
-               style="position: absolute; top: 10px; right: 20px; text-decoration: none; font-weight: bold; color: #d32f2f;">
-               Log In
-            </a>
+            <a href="{% url 'login' %}" class="auth-button">Log In</a>
         {% endif %}
     </header>
 
-    <div>
+    <div class="content">
         {% block content %}
         <!-- Page content goes here -->
         {% endblock %}
@@ -33,3 +100,4 @@
 
 </body>
 </html>
+

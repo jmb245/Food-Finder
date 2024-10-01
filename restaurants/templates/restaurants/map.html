@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,7 +26,7 @@
     <style>
         /* General styles */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
 
         .header {
@@ -47,14 +48,6 @@
             display: flex;
             align-items: center;
             font-weight: bold;
-        }
-
-        .heart-icon {
-            background-image: url('heart-icon.png'); /* Add your heart icon image here */
-            width: 16px;
-            height: 16px;
-            background-size: cover;
-            margin-right: 5px;
         }
 
         .search-bar {
@@ -87,7 +80,7 @@
         }
 
         .filter-icon {
-            background-image: url('filter-icon.png'); /* Add your filter icon image here */
+            background-image: url('{% static 'images/filter icon.png' %}'); /* Add your filter icon image here */
             width: 16px;
             height: 16px;
             background-size: cover;
@@ -165,7 +158,7 @@
     <div class="header">
         <h1>Welcome {{ user.username }}!</h1>
         <a href="{% url 'favorites' %}" class="favorites-button">
-            <i class="heart-icon"></i> Favorites
+            <i class="heart-icon"></i> ♥ Favorites
         </a>
     </div>
 
